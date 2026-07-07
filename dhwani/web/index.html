@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dhwani — transcripts</title>
+<style>
+  :root {
+    --bg: #0d0d10; --panel: #16161c; --line: #26262e;
+    --text: #e8e6e0; --dim: #8a8894; --accent: #e8b849; --ok: #6fc28b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    font: 15px/1.55 "Segoe UI", system-ui, sans-serif; padding: 40px 20px 80px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+  h1 { font-size: 26px; letter-spacing: .5px; }
+  h1 .dev { color: var(--accent); font-weight: 400; }
+  .status { margin-left: auto; font-size: 13px; color: var(--dim); display: flex; align-items: center; gap: 7px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); transition: background .3s; }
+  .dot.ready { background: var(--ok); }
+  .dot.rec { background: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .sub { color: var(--dim); font-size: 13.5px; margin-bottom: 34px; }
+  .sub kbd {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 5px;
+    padding: 1px 7px; font-family: Consolas, monospace; font-size: 12.5px; color: var(--accent);
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; margin-bottom: 12px;
+  }
+  .meta { display: flex; gap: 14px; font-size: 12px; color: var(--dim); margin-bottom: 8px; }
+  .meta .copy {
+    margin-left: auto; cursor: pointer; color: var(--dim); background: none;
+    border: 1px solid var(--line); border-radius: 5px; padding: 1px 10px; font-size: 12px;
+  }
+  .meta .copy:hover { color: var(--accent); border-color: var(--accent); }
+  .txt { white-space: pre-wrap; word-wrap: break-word; }
+  details { margin-top: 8px; }
+  summary { font-size: 12px; color: var(--dim); cursor: pointer; }
+  .raw { font-size: 13px; color: var(--dim); white-space: pre-wrap; margin-top: 5px; }
+  .empty { color: var(--dim); text-align: center; padding: 70px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>dhwani <span class="dev">ध्वनि</span></h1>
+    <div class="status"><span class="dot" id="dot"></span><span id="statustext">connecting…</span></div>
+  </header>
+  <p class="sub">Press <kbd id="hotkey">alt+v</kbd> to talk · press again to stop — text lands at your cursor.</p>
+  <div id="list"><p class="empty">No transcripts yet. Go say something.</p></div>
+</main>
+<script>
+  const fmt = ts => new Date(ts * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+
+  async function poll() {
+    try {
+      const [status, items] = await Promise.all([
+        fetch("/api/status").then(r => r.json()),
+        fetch("/api/transcripts").then(r => r.json()),
+      ]);
+      const dot = document.getElementById("dot");
+      const st = document.getElementById("statustext");
+      document.getElementById("hotkey").textContent = status.hotkey || "alt+v";
+      dot.className = "dot" + (status.recording ? " rec" : status.model_ready ? " ready" : "");
+      st.textContent = status.recording ? "recording…"
+        : status.model_ready ? `ready · whisper ${status.model_size}` : "loading model…";
+      render(items);
+    } catch { document.getElementById("statustext").textContent = "app not running"; }
+    setTimeout(poll, 2000);
+  }
+
+  function render(items) {
+    const list = document.getElementById("list");
+    if (!items.length) return;
+    list.innerHTML = "";
+    for (const t of items) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const showRaw = t.raw.trim() !== t.text.trim();
+      card.innerHTML = `
+        <div class="meta"><span>${fmt(t.created_at)}</span><span>${t.duration_s}s</span>
+          <button class="copy">copy</button></div>
+        <div class="txt"></div>
+        ${showRaw ? '<details><summary>raw whisper output</summary><div class="raw"></div></details>' : ""}`;
+      card.querySelector(".txt").textContent = t.text;
+      if (showRaw) card.querySelector(".raw").textContent = t.raw;
+      card.querySelector(".copy").onclick = e => {
+        navigator.clipboard.writeText(t.text);
+        e.target.textContent = "copied";
+        setTimeout(() => (e.target.textContent = "copy"), 1200);
+      };
+      list.appendChild(card);
+    }
+  }
+  poll();
+</script>
+</body>
+</html>

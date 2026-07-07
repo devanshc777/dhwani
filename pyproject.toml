@@ -1,0 +1,28 @@
+[project]
+name = "dhwani"
+version = "0.1.0"
+description = "Local push-to-talk dictation for Windows: Alt+V, speak, text lands at your cursor. Whisper on CPU, no cloud, no LLM."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Devansh Chowdhary", email = "devanshchowdhary03@gmail.com" }]
+keywords = ["dictation", "speech-to-text", "whisper", "voice", "wispr-flow"]
+dependencies = [
+    "faster-whisper>=1.0",
+    "sounddevice>=0.4.6",
+    "numpy>=1.24",
+    "keyboard>=0.13.5",
+    "pyperclip>=1.8",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.scripts]
+dhwani = "dhwani.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["dhwani"]
