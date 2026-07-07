@@ -18,7 +18,7 @@ if ($Uninstall) {
 
 $pythonw = Join-Path $repo ".venv\Scripts\pythonw.exe"
 if (-not (Test-Path $pythonw)) {
-    Write-Error "no venv at $repo\.venv — run .\run.ps1 once first"
+    Write-Error "no venv at $repo\.venv - run .\run.ps1 once first"
 }
 
 $shell = New-Object -ComObject WScript.Shell
@@ -26,7 +26,7 @@ $s = $shell.CreateShortcut($lnk)
 $s.TargetPath = $pythonw
 $s.Arguments = "-m dhwani"
 $s.WorkingDirectory = $repo
-$s.Description = "dhwani - local dictation (Tab+Q)"
+$s.Description = "dhwani - local dictation (Ctrl+F9)"
 $s.Save()
 Write-Host "autostart installed -> $lnk"
 Write-Host "runs hidden (pythonw); check http://127.0.0.1:8770 or Task Manager"
