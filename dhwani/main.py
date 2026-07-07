@@ -110,7 +110,9 @@ def main() -> None:
         root.after(60_000, _idle_watch)
 
     threading.Thread(target=_worker, daemon=True).start()
-    keyboard.add_hotkey(config.HOTKEY, toggle, suppress=True)
+    # suppress=False: a modifier-only chord types nothing, and suppressing it
+    # would eat Ctrl/Alt keydowns that other app shortcuts need.
+    keyboard.add_hotkey(config.HOTKEY, toggle, suppress=False)
 
     threading.Thread(
         target=uvicorn.run,

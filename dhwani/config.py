@@ -27,10 +27,11 @@ INITIAL_PROMPT = os.getenv(
 )
 
 SAMPLE_RATE = 16_000  # whisper's native rate
-# Ctrl+F9: Tab+Q (v0.2) kept firing while tab-cycling in browsers; a chorded
-# F-key can't collide with typing or site shortcuts. (Bare Fn is firmware-level
-# and invisible to the OS, so it can't be part of a software hotkey.)
-HOTKEY = os.getenv("DHWANI_HOTKEY", "ctrl+f9")
+# Ctrl+Alt: Tab+Q (v0.2) kept firing while tab-cycling in browsers. Bare Fn is
+# firmware-level and invisible to the OS, so a two-modifier chord is the
+# simplest reachable toggle. Trade-off: Ctrl+Alt+<x> app shortcuts (and AltGr
+# on some layouts) also fire it; the 0.5 s debounce absorbs the repeats.
+HOTKEY = os.getenv("DHWANI_HOTKEY", "ctrl+alt")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
 
 # Free the model weights (~300 MB for base) after this many idle minutes;

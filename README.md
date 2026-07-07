@@ -1,7 +1,7 @@
 # dhwani <sub>ध्वनि · "sound"</sub>
 
-Local push-to-talk dictation for Windows. Press **Ctrl+F9**, speak, press
-**Ctrl+F9** again — clean text lands wherever your cursor is. Whisper on CPU,
+Local push-to-talk dictation for Windows. Press **Ctrl+Alt**, speak, press
+**Ctrl+Alt** again — clean text lands wherever your cursor is. Whisper on CPU,
 zero cloud, zero LLM, zero subscription.
 
 A minimal open-source take on the [Wispr Flow](https://wisprflow.ai) idea:
@@ -11,7 +11,7 @@ Python standard library.
 ## How it works
 
 ```
-Ctrl+F9 ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
+Ctrl+Alt ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
           (sounddevice)   (base, int8, CPU)  (fillers, cmds)   (clipboard)
                │                                    │
         waveform overlay                       SQLite history
@@ -24,7 +24,7 @@ the others. The data contract is the architecture.
 
 ## Features
 
-- **Ctrl+F9 toggle** anywhere in Windows (configurable), debounced against key
+- **Ctrl+Alt toggle** anywhere in Windows (configurable), debounced against key
   auto-repeat; utterances process strictly in order
 - **Floating waveform pill** — a small transparent glow-waveform while
   recording that never steals focus from the app you're dictating into
@@ -59,7 +59,7 @@ cd dhwani
 | `DHWANI_MODEL` | `base` | `tiny` (fastest) / `base` / `small` (most accurate) |
 | `DHWANI_LANGUAGE` | `en` | any whisper code, or `auto` (unreliable on short clips) |
 | `DHWANI_PROMPT` | your names/jargon | words the decoder should spell correctly |
-| `DHWANI_HOTKEY` | `ctrl+f9` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
+| `DHWANI_HOTKEY` | `ctrl+alt` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
 | `DHWANI_IDLE_UNLOAD_MIN` | `30` | minutes before model unloads (0 = never) |
 | `DHWANI_PORT` | `8770` | web UI port |
 | `DHWANI_DB` | `~/.dhwani/transcripts.db` | history location |
