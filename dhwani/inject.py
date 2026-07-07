@@ -28,7 +28,7 @@ def paste(text: str) -> None:
 
     pyperclip.copy(text)
 
-    for key in ("alt", "ctrl", "shift", "windows"):
+    for key in ("alt", "ctrl", "shift", "windows", "tab"):
         keyboard.release(key)
     time.sleep(0.15)  # let the target app see the modifiers go up
 

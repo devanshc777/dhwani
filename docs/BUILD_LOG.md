@@ -55,3 +55,37 @@ confirmed (same codebase, aged wheel, trusted). Pinned in pyproject.toml with
 a comment. If SAC keeps eating native wheels,
 the escape hatch is an onnxruntime-based transcriber backend (Microsoft-signed
 DLLs pass) behind the same `transcribe(audio) -> str` contract.
+
+## 2026-07-07 (v0.2) — field-test fixes from the first live run
+
+First real dictation exposed four bugs, all fixed:
+
+1. **Hotkey auto-repeat flood** — holding the combo re-fired `toggle()` every
+   ~120 ms (the "empty utterance 0.1s" wall in the log) and ran 3 transcriptions
+   concurrently. Fix: 0.5 s debounce + a single worker queue so utterances
+   process and inject strictly in order.
+2. **Cyrillic from English speech** — language auto-detect on sub-second clips
+   is a coin toss (log showed `'ru' p=0.20`). Fix: `DHWANI_LANGUAGE=en` default.
+3. **"You You… Hi. Hi." ghosts** — whisper hallucinating over silence. Fix:
+   `vad_filter=True` (faster-whisper's bundled Silero, *in-clip* silence
+   stripping — revises v0.1's "no VAD" stance: utterance-delimiting VAD is
+   still out, in-clip filtering earns its place at zero dependency cost).
+4. **"Chowdhary" → "Chaudhary"** — decoder spelling bias added via
+   `initial_prompt` (`DHWANI_PROMPT`).
+
+Plus: hotkey → **Tab+Q** (tab added to the pre-paste release list) ·
+idle model unload after 30 min (~300 MB freed, ~2 s transparent reload —
+chosen over exit-and-watcher: one process, no IPC/races) ·
+`scripts/install-autostart.ps1` (Startup shortcut, pythonw hidden) ·
+overlay redone as transparent layered-glow waveform (200×44, violet; PIL
+preview render before shipping) · web UI matched to the palette ·
+`eval/run.py` WER harness (stdlib edit-distance, vtt/srt support, --grid
+config comparison; WER fn unit-tested — caught a del/ins label swap).
+
+**Sandbox note:** Cowork's mount also serves *stale file sizes* to the Linux
+sandbox after host-side writes (reads truncate at old byte counts) — verified
+all rewritten files by compiling authored content directly instead. Host files
+confirmed intact via direct reads.
+
+**Open:** real-voice WER numbers (needs his mic — run the eval harness),
+model-size decision (`base` vs `small`) pending those numbers.

@@ -1,7 +1,9 @@
-"""The little recording pill: a borderless, always-on-top strip of animated
-level bars near the bottom of the screen while recording.
-
-tkinter (stdlib) instead of a GUI dependency — it's one canvas.
+"""The recording pill: a small floating waveform near the bottom of the
+screen while recording — smooth mirrored glow lines (violet/indigo), not
+bars. tkinter has no alpha blending, so "glow" is layered strokes: wide
+dark stroke under progressively narrower, brighter ones. The window
+background is keyed transparent (-transparentcolor), so only the waveform
+floats over whatever's behind it.
 
 Critical detail: WS_EX_NOACTIVATE. The overlay must NEVER take keyboard
 focus — focus stays in the app the user is dictating into, or the paste
@@ -15,8 +17,10 @@ GWL_EXSTYLE = -20
 WS_EX_NOACTIVATE = 0x08000000
 WS_EX_TOOLWINDOW = 0x00000080
 
-WIDTH, HEIGHT, BARS = 240, 56, 24
-BG, BAR_COLOR = "#0d0d10", "#e8b849"
+WIDTH, HEIGHT = 200, 44
+BG = "#0a0714"  # also the transparency key color
+# glow = layered strokes, darkest/widest first
+LAYERS = [("#2a1b5e", 7), ("#5b3fd4", 4), ("#8f6fff", 2), ("#e6ddff", 1)]
 
 
 class Overlay:
@@ -34,8 +38,12 @@ class Overlay:
         win = tk.Toplevel(self._root)
         win.overrideredirect(True)
         win.attributes("-topmost", True)
+        try:
+            win.attributes("-transparentcolor", BG)  # float the waveform alone
+        except tk.TclError:
+            pass  # non-Windows: solid pill, still fine
         sw, sh = win.winfo_screenwidth(), win.winfo_screenheight()
-        win.geometry(f"{WIDTH}x{HEIGHT}+{(sw - WIDTH) // 2}+{sh - HEIGHT - 80}")
+        win.geometry(f"{WIDTH}x{HEIGHT}+{(sw - WIDTH) // 2}+{sh - HEIGHT - 70}")
         win.configure(bg=BG)
 
         self._canvas = tk.Canvas(
@@ -58,20 +66,32 @@ class Overlay:
         except Exception:
             pass  # non-Windows: overlay still works, just may take focus
 
+    def _wave_points(self) -> list[float]:
+        """Zigzag through the level history; smooth=True splines it into a
+        waveform. Newest audio on the right."""
+        levels = list(self._levels)
+        n = self._levels.maxlen or 28
+        mid = HEIGHT / 2
+        step = WIDTH / (n - 1)
+        pts: list[float] = []
+        for i in range(n):
+            level = levels[-(n - i)] if len(levels) >= n - i else 0.0
+            amp = min(mid - 4, 1.5 + level * 300)
+            y = mid - amp if i % 2 == 0 else mid + amp
+            pts += [i * step, y]
+        return pts
+
     def _animate(self) -> None:
         if self._win is None or self._canvas is None:
             return
         c = self._canvas
         c.delete("all")
-        levels = list(self._levels)
-        slot = WIDTH / BARS
-        mid = HEIGHT / 2
-        for i in range(BARS):
-            # newest level on the right, fading history to the left
-            level = levels[-(BARS - i)] if len(levels) >= BARS - i else 0.0
-            half = max(2.0, min(mid - 6, level * 260))  # RMS -> pixel half-height
-            x = i * slot + slot / 2
-            c.create_line(x, mid - half, x, mid + half, fill=BAR_COLOR, width=3)
+        pts = self._wave_points()
+        for color, width in LAYERS:
+            c.create_line(
+                *pts, smooth=True, fill=color, width=width,
+                capstyle=tk.ROUND, joinstyle=tk.ROUND,
+            )
         self._win.after(50, self._animate)  # ~20 fps is plenty for a meter
 
     def hide(self) -> None:

@@ -30,5 +30,5 @@ if (-not (Test-Path ".venv")) {
 }
 
 Write-Host ""
-Write-Host "dhwani starting - Alt+V to dictate - transcripts at http://127.0.0.1:8770"
+Write-Host "dhwani starting - Tab+Q to dictate - transcripts at http://127.0.0.1:8770"
 & ".venv\Scripts\python.exe" -m dhwani

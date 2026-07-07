@@ -6,8 +6,13 @@
 <title>dhwani — transcripts</title>
 <style>
   :root {
-    --bg: #0d0d10; --panel: #16161c; --line: #26262e;
-    --text: #e8e6e0; --dim: #8a8894; --accent: #e8b849; --ok: #6fc28b;
+    --bg: #0a0714; --panel: #131022; --line: #251e3d;
+    --text: #eae6f5; --dim: #8d86a8; --accent: #8f6fff; --ok: #8f6fff;
+  }
+  body::before {
+    content: ""; position: fixed; inset: -20% -10% auto; height: 55%;
+    background: radial-gradient(ellipse at 50% 0%, #2a1b5e55, transparent 70%);
+    pointer-events: none;
   }
   * { box-sizing: border-box; margin: 0; }
   body {

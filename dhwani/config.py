@@ -13,13 +13,26 @@ MODEL_SIZE = os.getenv("DHWANI_MODEL", "base")
 DEVICE = "cpu"
 COMPUTE_TYPE = "int8"  # quantized CPU inference via CTranslate2
 
-# None = whisper auto-detects language per utterance (handles Hinglish);
-# set DHWANI_LANGUAGE=en to pin English for speed + accuracy.
-LANGUAGE = os.getenv("DHWANI_LANGUAGE") or None
+# Pinned to English by default: auto-detect on short utterances is a coin
+# toss (v0.1 field test: 0.3s clips detected as Russian at p=0.20 and came
+# out as Cyrillic). Set DHWANI_LANGUAGE=auto to re-enable detection, or
+# e.g. hi for Hindi.
+_lang = os.getenv("DHWANI_LANGUAGE", "en").strip().lower()
+LANGUAGE = None if _lang in ("", "auto") else _lang
+
+# Decoder bias: words whisper should spell correctly (names, jargon).
+# Comma-separated, fed as initial_prompt. Fixes "Chowdhary" -> "Chaudhary".
+INITIAL_PROMPT = os.getenv(
+    "DHWANI_PROMPT", "Devansh Chowdhary, dhwani, FastAPI, Qilin."
+)
 
 SAMPLE_RATE = 16_000  # whisper's native rate
-HOTKEY = os.getenv("DHWANI_HOTKEY", "alt+v")
+HOTKEY = os.getenv("DHWANI_HOTKEY", "tab+q")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
+
+# Free the model weights (~300 MB for base) after this many idle minutes;
+# they reload transparently (~2 s) on the next hotkey press. 0 disables.
+IDLE_UNLOAD_MIN = float(os.getenv("DHWANI_IDLE_UNLOAD_MIN", "30"))
 
 DB_PATH = Path(os.getenv("DHWANI_DB", "~/.dhwani/transcripts.db")).expanduser()
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
