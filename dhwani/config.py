@@ -27,11 +27,11 @@ INITIAL_PROMPT = os.getenv(
 )
 
 SAMPLE_RATE = 16_000  # whisper's native rate
-# Ctrl+Alt: Tab+Q (v0.2) kept firing while tab-cycling in browsers. Bare Fn is
-# firmware-level and invisible to the OS, so a two-modifier chord is the
-# simplest reachable toggle. Trade-off: Ctrl+Alt+<x> app shortcuts (and AltGr
-# on some layouts) also fire it; the 0.5 s debounce absorbs the repeats.
-HOTKEY = os.getenv("DHWANI_HOTKEY", "ctrl+alt")
+# Right Ctrl, tapped: the least-colliding trigger on a Windows laptop. Bare Fn
+# is firmware-invisible, F-keys sit behind media mode, and every modifier
+# chord (Ctrl+Alt, Ctrl+Shift+Alt) doubles as some app's shortcut prefix.
+# Nothing binds bare Right Ctrl, and left Ctrl still carries all shortcuts.
+HOTKEY = os.getenv("DHWANI_HOTKEY", "right ctrl")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
 
 # Free the model weights (~300 MB for base) after this many idle minutes;
