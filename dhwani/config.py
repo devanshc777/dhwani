@@ -32,7 +32,9 @@ SAMPLE_RATE = 16_000  # whisper's native rate
 # and every modifier chord (Ctrl+Alt, Ctrl+Shift+Alt) doubles as some app's
 # shortcut prefix. Left Alt still carries all shortcuts. On AltGr layouts
 # (right alt types accents), override via DHWANI_HOTKEY instead.
-HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt")
+# Comma-separated aliases all bind to the same toggle: Windows reports the
+# physical Right Alt key as "alt gr" on some layouts and "right alt" on others.
+HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt,alt gr")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
 
 # Free the model weights (~300 MB for base) after this many idle minutes;

@@ -39,7 +39,7 @@ def main() -> None:
 
     recorder = Recorder()
     transcriber = Transcriber()  # starts loading immediately, in background
-    state.update(model_size=config.MODEL_SIZE, hotkey=config.HOTKEY)
+    state.update(model_size=config.MODEL_SIZE, hotkey=config.HOTKEY.split(",")[0].strip())
 
     root = tk.Tk()
     root.withdraw()  # no main window; tk exists to host the overlay
@@ -111,8 +111,10 @@ def main() -> None:
 
     threading.Thread(target=_worker, daemon=True).start()
     # suppress=False: a modifier-only chord types nothing, and suppressing it
-    # would eat Ctrl/Alt keydowns that other app shortcuts need.
-    keyboard.add_hotkey(config.HOTKEY, toggle, suppress=False)
+    # would eat Ctrl/Alt keydowns that other app shortcuts need. Each comma-
+    # separated alias binds the same toggle (see config.HOTKEY).
+    for hk in [h.strip() for h in config.HOTKEY.split(",") if h.strip()]:
+        keyboard.add_hotkey(hk, toggle, suppress=False)
 
     threading.Thread(
         target=uvicorn.run,
