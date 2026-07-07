@@ -35,7 +35,16 @@ DEBOUNCE_S = 0.5  # Windows key auto-repeat re-fires hotkeys every ~120 ms
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    # File log next to the DB: under pythonw there is no console, so this file
+    # is the only place startup errors and crashes are visible.
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(config.DB_PATH.parent / "dhwani.log", encoding="utf-8"),
+        ],
+    )
 
     recorder = Recorder()
     transcriber = Transcriber()  # starts loading immediately, in background

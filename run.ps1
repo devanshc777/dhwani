@@ -24,6 +24,20 @@ function Repair-VenvPython {
     }
 }
 
+# The pythonw uv stub is worse than blocked: it relaunches console python.exe
+# underneath, so "hidden" runs own a visible terminal and die when it's closed.
+# Always ensure Scripts\pythonw.exe is the real base binary (~90KB, not ~45KB).
+function Repair-VenvPythonw {
+    param([string]$Venv = ".venv")
+    $cfg = Join-Path $Venv "pyvenv.cfg"
+    if (-not (Test-Path $cfg)) { return }
+    $pyw = Join-Path $Venv "Scripts\pythonw.exe"
+    if ((Test-Path $pyw) -and (Get-Item $pyw).Length -gt 60KB) { return }
+    $base = (Select-String -Path $cfg -Pattern '^home\s*=\s*(.+)').Matches[0].Groups[1].Value.Trim()
+    Copy-Item "$base\pythonw.exe" $pyw -Force
+    Write-Host "pythonw stub replaced with base binary (windowless runs now truly detach)"
+}
+
 if (-not (Test-Path ".venv")) {
     uv venv
     Repair-VenvPython
@@ -31,6 +45,7 @@ if (-not (Test-Path ".venv")) {
 } else {
     Repair-VenvPython
 }
+Repair-VenvPythonw
 
 Write-Host ""
 if ($Background) {
