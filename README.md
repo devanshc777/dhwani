@@ -1,7 +1,7 @@
 # dhwani <sub>ध्वनि · "sound"</sub>
 
-Local push-to-talk dictation for Windows. Press **Right Ctrl**, speak, press
-**Right Ctrl** again — clean text lands wherever your cursor is. Whisper on CPU,
+Local push-to-talk dictation for Windows. Press **Right Alt**, speak, press
+**Right Alt** again — clean text lands wherever your cursor is. Whisper on CPU,
 zero cloud, zero LLM, zero subscription.
 
 A minimal open-source take on the [Wispr Flow](https://wisprflow.ai) idea:
@@ -11,7 +11,7 @@ Python standard library.
 ## How it works
 
 ```
-Right Ctrl ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
+Right Alt ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
           (sounddevice)   (base, int8, CPU)  (fillers, cmds)   (clipboard)
                │                                    │
         waveform overlay                       SQLite history
@@ -24,7 +24,7 @@ the others. The data contract is the architecture.
 
 ## Features
 
-- **Right Ctrl toggle** anywhere in Windows (configurable), debounced against key
+- **Right Alt toggle** anywhere in Windows (configurable), debounced against key
   auto-repeat; utterances process strictly in order
 - **Floating waveform pill** — a small transparent glow-waveform while
   recording that never steals focus from the app you're dictating into
@@ -59,7 +59,22 @@ cd dhwani
 | `DHWANI_MODEL` | `base` | `tiny` (fastest) / `base` / `small` (most accurate) |
 | `DHWANI_LANGUAGE` | `en` | any whisper code, or `auto` (unreliable on short clips) |
 | `DHWANI_PROMPT` | your names/jargon | words the decoder should spell correctly |
-| `DHWANI_HOTKEY` | `right ctrl` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
+| `DHWANI_HOTKEY` | `right alt` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
+
+### Changing the key binding
+
+The trigger lives on one line, `HOTKEY` in [`dhwani/config.py`](dhwani/config.py):
+
+```python
+HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt")
+```
+
+Set the `DHWANI_HOTKEY` env var (no code change), or edit the default string.
+Any combo the [`keyboard`](https://github.com/boppreh/keyboard) library parses
+works: `f8`, `ctrl+win`, `ctrl+shift+d`, `right ctrl`, ... Two notes if you
+clone this: bare `Fn` is firmware-level and invisible to the OS, so it can't
+be bound; and on AltGr layouts the default `right alt` types accents, so pick
+something else.
 | `DHWANI_IDLE_UNLOAD_MIN` | `30` | minutes before model unloads (0 = never) |
 | `DHWANI_PORT` | `8770` | web UI port |
 | `DHWANI_DB` | `~/.dhwani/transcripts.db` | history location |

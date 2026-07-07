@@ -27,11 +27,12 @@ INITIAL_PROMPT = os.getenv(
 )
 
 SAMPLE_RATE = 16_000  # whisper's native rate
-# Right Ctrl, tapped: the least-colliding trigger on a Windows laptop. Bare Fn
-# is firmware-invisible, F-keys sit behind media mode, and every modifier
-# chord (Ctrl+Alt, Ctrl+Shift+Alt) doubles as some app's shortcut prefix.
-# Nothing binds bare Right Ctrl, and left Ctrl still carries all shortcuts.
-HOTKEY = os.getenv("DHWANI_HOTKEY", "right ctrl")
+# Right Alt, tapped: the least-colliding trigger on this keyboard (no Right
+# Ctrl present). Bare Fn is firmware-invisible, F-keys sit behind media mode,
+# and every modifier chord (Ctrl+Alt, Ctrl+Shift+Alt) doubles as some app's
+# shortcut prefix. Left Alt still carries all shortcuts. On AltGr layouts
+# (right alt types accents), override via DHWANI_HOTKEY instead.
+HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
 
 # Free the model weights (~300 MB for base) after this many idle minutes;
