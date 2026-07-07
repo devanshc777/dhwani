@@ -89,3 +89,36 @@ confirmed intact via direct reads.
 
 **Open:** real-voice WER numbers (needs his mic — run the eval harness),
 model-size decision (`base` vs `small`) pending those numbers.
+
+## 2026-07-07 (v0.3) — pill redesign + context words
+
+Field feedback on v0.2 overlay: "weird green-purple, front going up and down,
+looking weird." Diagnosis: (a) anti-aliased violet strokes blending against
+the transparency key color → off-hue fringe pixels; (b) raw per-frame RMS →
+the zigzag teleports every frame. Studied Wispr Flow's actual pill (docs +
+pillfloat repo): a *small solid dark capsule* (~70px) with a few bars that
+flatten on silence — solid body confines key-color blending to the silhouette.
+
+**Overlay v3:** 132×34 solid capsule (thick round-capped line trick = capsule
++ 1px border for free), 13 rounded bars, eased toward RMS targets
+(`shown += (target-shown)*0.35`, 30fps) instead of jumping, violet→white
+color by amplitude, silence reads as a dotted line. No green possible.
+
+**Web UI v2** (frontend-design skill principles: one signature element,
+interface-voice copy, quality floor): serif wordmark with a living-underline
+canvas that breathes while recording (the signature), context-words panel,
+search, day-grouped entries, mono metadata. **Context words**: user-managed
+vocabulary in SQLite, CRUD at /api/prompt/{word}, appended to whisper's
+initial_prompt per-utterance — add "Qilin", "Heyllo", "MUJ" from the UI and
+they spell correctly from the next utterance.
+
+Skills consulted: anthropics/frontend-design (fetched upstream — local
+~/.claude copies unreachable from the sandbox), Wispr Flow help-center docs,
+OrangeAKA/pillfloat. taste-skill fetch came back empty (path moved upstream).
+
+**Verified:** authored-content AST checks (mount still serves stale sizes —
+host content confirmed via host-side grep: all new markers present),
+prompt-builder logic unit-checked, PIL preview of the capsule rendered.
+**Open:** user's live verdict on the capsule; tk's 1px-border capsule has no
+soft shadow — if it must match Wispr's depth exactly, that's the
+pywebview/DirectComposition upgrade.

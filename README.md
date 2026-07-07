@@ -31,6 +31,8 @@ the others. The data contract is the architecture.
 - **Tuned transcription** — language pinned (auto-detect misfires on short
   clips), in-clip silence filtering (kills "You You… Hi. Hi." hallucinations),
   `initial_prompt` bias so your name and jargon spell correctly
+- **Context words** — add names, products, and jargon from the web UI; they
+  feed the decoder before every utterance and take effect immediately
 - **Filler stripping** (um / uh / erm…) + voice commands: say
   *"new line"* / *"new paragraph"* and get exactly that
 - **Transcript history** — local web UI at `http://127.0.0.1:8770` with

@@ -19,7 +19,14 @@ import time
 import numpy as np
 from faster_whisper import WhisperModel
 
-from . import config
+from . import config, store
+
+
+def _prompt() -> str:
+    """Base prompt (env) + user-managed context words from the web UI."""
+    base = config.INITIAL_PROMPT.strip().rstrip(".")
+    words = store.prompt_words()
+    return base + (", " + ", ".join(words) if words else "") + "."
 
 
 class Transcriber:
@@ -55,7 +62,7 @@ class Transcriber:
         segments, _ = model.transcribe(
             audio,
             language=config.LANGUAGE,
-            initial_prompt=config.INITIAL_PROMPT,
+            initial_prompt=_prompt(),
             beam_size=5,
             vad_filter=True,
             vad_parameters={"min_silence_duration_ms": 500},

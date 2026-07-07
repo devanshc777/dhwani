@@ -1,4 +1,4 @@
-"""Localhost web UI: transcript history + live status.
+"""Localhost web UI: transcript history, live status, context words.
 
 One FastAPI app, one HTML file, zero build step. The page polls JSON —
 at dictation rates a WebSocket would be ceremony.
@@ -32,3 +32,20 @@ def status() -> dict:
 @app.get("/api/transcripts")
 def transcripts() -> list[dict]:
     return store.recent()
+
+
+@app.get("/api/prompt")
+def get_prompt_words() -> list[str]:
+    return store.prompt_words()
+
+
+@app.post("/api/prompt/{word}")
+def add_prompt_word(word: str) -> list[str]:
+    store.add_prompt_word(word)
+    return store.prompt_words()
+
+
+@app.delete("/api/prompt/{word}")
+def remove_prompt_word(word: str) -> list[str]:
+    store.remove_prompt_word(word)
+    return store.prompt_words()

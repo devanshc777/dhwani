@@ -1,6 +1,9 @@
-"""Transcript history in SQLite (stdlib). One connection per call keeps it
-trivially thread-safe across the hotkey worker and the web server threads —
-at dictation rates, connection cost is irrelevant.
+"""Transcript history + context words in SQLite (stdlib). One connection
+per call keeps it trivially thread-safe across the hotkey worker and the
+web server threads — at dictation rates, connection cost is irrelevant.
+
+Context words are user-managed vocabulary (names, jargon) appended to
+whisper's initial_prompt so they spell correctly. Managed from the web UI.
 """
 
 import sqlite3
@@ -15,13 +18,17 @@ CREATE TABLE IF NOT EXISTS transcripts (
     duration_s REAL NOT NULL,
     raw TEXT NOT NULL,
     text TEXT NOT NULL
-)
+);
+CREATE TABLE IF NOT EXISTS prompt_words (
+    word TEXT PRIMARY KEY,
+    added_at REAL NOT NULL
+);
 """
 
 
 def _conn() -> sqlite3.Connection:
     conn = sqlite3.connect(config.DB_PATH)
-    conn.execute(_SCHEMA)
+    conn.executescript(_SCHEMA)
     return conn
 
 
@@ -44,3 +51,27 @@ def recent(limit: int = 200) -> list[dict]:
         {"id": r[0], "created_at": r[1], "duration_s": r[2], "raw": r[3], "text": r[4]}
         for r in rows
     ]
+
+
+def prompt_words() -> list[str]:
+    with _conn() as conn:
+        rows = conn.execute(
+            "SELECT word FROM prompt_words ORDER BY added_at"
+        ).fetchall()
+    return [r[0] for r in rows]
+
+
+def add_prompt_word(word: str) -> None:
+    word = word.strip()
+    if not word:
+        return
+    with _conn() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO prompt_words (word, added_at) VALUES (?, ?)",
+            (word, time.time()),
+        )
+
+
+def remove_prompt_word(word: str) -> None:
+    with _conn() as conn:
+        conn.execute("DELETE FROM prompt_words WHERE word = ?", (word,))
