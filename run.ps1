@@ -1,4 +1,7 @@
 # dhwani bring-up: venv + deps + launch. Safe to re-run.
+# -Background: launch hidden via pythonw (survives closing this window).
+
+param([switch]$Background)
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
@@ -30,5 +33,10 @@ if (-not (Test-Path ".venv")) {
 }
 
 Write-Host ""
-Write-Host "dhwani starting - Right Alt to dictate - transcripts at http://127.0.0.1:8770"
-& ".venv\Scripts\python.exe" -m dhwani
+if ($Background) {
+    Start-Process -FilePath (Resolve-Path ".venv\Scripts\pythonw.exe") -ArgumentList "-m","dhwani" -WorkingDirectory $PSScriptRoot
+    Write-Host "dhwani running hidden - Right Alt to dictate - http://127.0.0.1:8770 (survives closing this window)"
+} else {
+    Write-Host "dhwani starting - Right Alt to dictate - transcripts at http://127.0.0.1:8770 (closes with this window; use -Background to detach)"
+    & ".venv\Scripts\python.exe" -m dhwani
+}
