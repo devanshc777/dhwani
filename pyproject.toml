@@ -9,6 +9,10 @@ authors = [{ name = "Devansh Chowdhary", email = "devanshchowdhary03@gmail.com" 
 keywords = ["dictation", "speech-to-text", "whisper", "voice", "wispr-flow"]
 dependencies = [
     "faster-whisper>=1.0",
+    # av pinned one major line back: Smart App Control blocks fresh native
+    # wheels by reputation (av 18.0.0 = new release = blocked; 13.1.0 = aged =
+    # trusted). See docs/BUILD_LOG.md 2026-07-07. Bump cautiously.
+    "av==13.1.0",
     "sounddevice>=0.4.6",
     "numpy>=1.24",
     "keyboard>=0.13.5",

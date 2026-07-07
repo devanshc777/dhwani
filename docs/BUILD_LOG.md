@@ -39,3 +39,19 @@ so first live run happens on the host machine).
 **Not done yet (honest):** no live end-to-end run on the host (sandbox has no
 mic/display); OpenVINO path unstarted; no tray icon; hotkey conflicts with any
 app that binds Alt+V locally.
+
+## 2026-07-07 (first live run) — Application Control blocks PyAV
+
+`run.ps1` installed clean (39 pkgs) but `import av` died:
+`DLL load failed while importing _core: An Application Control policy has
+blocked this file.` Same reputation mechanism as the machine's known uv-stub
+issue (SYSTEM.md Known Issues), different victim: **av 18.0.0 is a fresh
+release with no reputation**, and the stub swap-trick doesn't apply to
+arbitrary native wheels. Fix ladder tried: (1) retry after reputation
+catch-up, (2) pin `av==13.1.0` (aged build, established reputation),
+(3) check ctranslate2 next — also native, (4) inspect Smart App Control state.
+**Resolved same day:** `av==13.1.0` imports clean — reputation theory
+confirmed (same codebase, aged wheel, trusted). Pinned in pyproject.toml with
+a comment. If SAC keeps eating native wheels,
+the escape hatch is an onnxruntime-based transcriber backend (Microsoft-signed
+DLLs pass) behind the same `transcribe(audio) -> str` contract.
