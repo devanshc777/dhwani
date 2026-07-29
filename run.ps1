@@ -38,6 +38,18 @@ function Repair-VenvPythonw {
     Write-Host "pythonw stub replaced with base binary (windowless runs now truly detach)"
 }
 
+# Non-developers won't have uv. Install it for them (user-level, no admin) so
+# "right-click run.ps1 -> Run with PowerShell" is genuinely the whole install.
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    Write-Host "uv not found - installing it (one time, no admin needed)..."
+    Invoke-RestMethod https://astral.sh/uv/install.ps1 | Invoke-Expression
+    $env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
+}
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    Write-Error "uv did not land on PATH. Close this window, open a new one, and run .\run.ps1 again."
+    exit 1
+}
+
 if (-not (Test-Path ".venv")) {
     uv venv
     Repair-VenvPython

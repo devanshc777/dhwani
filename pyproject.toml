@@ -1,7 +1,7 @@
 [project]
 name = "dhwani"
 version = "0.1.0"
-description = "Local push-to-talk dictation for Windows: Alt+V, speak, text lands at your cursor. Whisper on CPU, no cloud, no LLM."
+description = "Local push-to-talk dictation for Windows: Right Alt, speak, text lands at your cursor. Whisper on CPU, no cloud, no LLM."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
