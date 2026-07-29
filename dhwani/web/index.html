@@ -81,6 +81,21 @@
   .btn:hover { background: var(--forest-2); }
   .btn:active { transform: translateY(1px); }
 
+  /* ---- coming soon: honest placeholder, deliberately quieter than shipped UI ---- */
+  .soon { margin: 30px 0 6px; }
+  .soon h2 { font-family: var(--serif); font-size: 20px; font-weight: 400; margin-bottom: 4px; }
+  .soon ul { list-style: none; padding: 0; margin: 12px 0 0; }
+  .soon li {
+    display: flex; gap: 12px; align-items: flex-start; padding: 11px 0;
+    border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; line-height: 1.55;
+  }
+  .soon li strong { color: var(--ink-soft); font-weight: 600; }
+  .badge {
+    flex: none; margin-top: 1px; font: 10.5px var(--mono); letter-spacing: .06em;
+    text-transform: uppercase; background: var(--sage); border: 1px solid var(--sage-line);
+    border-radius: 999px; padding: 2px 9px; color: var(--ink-soft);
+  }
+
   .searchrow { margin: 34px 0 6px; }
   .searchrow input { width: 100%; }
 
@@ -135,6 +150,19 @@
       <input type="text" id="newword" placeholder="Add a name, product, term" maxlength="60">
       <button class="btn" id="addbtn">Add</button>
     </div>
+  </section>
+
+  <section class="soon">
+    <h2>Coming soon</h2>
+    <p class="hint">Not built yet — listed so you're not looking for a button that isn't there.</p>
+    <ul>
+      <li><span class="badge">soon</span><span><strong>In-app context</strong> — dhwani noticing which
+        application you're dictating into, and adapting: per-app vocabulary and formatting. Today the
+        Dictionary above is one global list for every app.</span></li>
+      <li><span class="badge">soon</span><span><strong>UI/UX overhaul</strong> — hotkey, model and
+        language editable here instead of through environment variables, live recording feedback, and a
+        tray icon. This page is a functional first pass, not the final design.</span></li>
+    </ul>
   </section>
 
   <div class="searchrow">
