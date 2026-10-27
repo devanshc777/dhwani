@@ -1,11 +1,16 @@
-"""The recording pill, Wispr-style: a small solid dark capsule at the
-bottom of the screen with a row of eased level bars inside it.
+"""The recording pill: a small forest-green capsule at the bottom of the
+screen, a mint "live" dot, and one flowing line that swells with your voice.
 
-Why a solid capsule (v3) and not floating strokes (v2): anti-aliased
-strokes blend against the transparency key color and produce off-hue
-fringe pixels ("weird green"), and raw per-frame RMS makes any wave shape
-teleport jarringly. A solid body confines key-color blending to the
-capsule silhouette, and bars ease toward their targets instead of jumping.
+Why this look (v4): the pill wears the web UI's colours (forest, mint,
+cream) and the hero's motif, a single hand-drawn line, instead of v3's
+violet bar meter, which belonged to no other part of dhwani. Each colour has
+one job: mint means "listening" (the dot breathes even in silence, so you
+can tell a quiet mic from a stopped one), cream is your voice.
+
+Why a solid capsule (since v3): anti-aliased strokes blend against the
+transparency key color and produce off-hue fringe pixels, so the body stays
+solid and the key only touches its silhouette. Levels ease toward their
+targets instead of jumping.
 
 Capsule trick: one thick horizontal line with rounded caps IS a capsule —
 two of them, 2px apart in width, give a 1px border for free.
@@ -15,28 +20,26 @@ the app being dictated into, or the paste lands in the pill.
 """
 
 import ctypes
+import math
 import tkinter as tk
 
 GWL_EXSTYLE = -20
 WS_EX_NOACTIVATE = 0x08000000
 WS_EX_TOOLWINDOW = 0x00000080
 
-WIDTH, HEIGHT = 132, 34
+WIDTH, HEIGHT = 148, 34
 KEY = "#010203"       # transparency key; never used in the artwork
-PILL_BG = "#14101f"
-PILL_EDGE = "#2e2547"
+PILL_BG = "#1d3d2f"   # --forest in web/index.html
+PILL_EDGE = "#33604a" # --forest-line
+LIVE = "#b9e0c3"      # --mint: the "listening" dot
+VOICE = "#f3eddd"     # --cream: the voice line
 
-N_BARS = 13
-BAR_W = 3
-GAP = 4
-MAX_AMP = (HEIGHT - 14) / 2   # bar half-height ceiling inside the capsule
-LOW = (109, 91, 208)          # quiet bar color
-HIGH = (237, 233, 254)        # loud bar color
-
-
-def _lerp_color(t: float) -> str:
-    r, g, b = (round(a + (b_ - a) * t) for a, b_ in zip(LOW, HIGH))
-    return f"#{r:02x}{g:02x}{b:02x}"
+DOT_X = 17
+DOT_R = 3.5
+LINE_X0, LINE_X1 = 30, WIDTH - 16
+N_POINTS = 28
+MAX_AMP = (HEIGHT - 12) / 2   # line half-height ceiling inside the capsule
+QUIET_AMP = 1.0               # silence reads as a faint ripple, not a dead line
 
 
 class Overlay:
@@ -47,7 +50,8 @@ class Overlay:
         self._levels = levels  # Recorder.levels deque (audio thread writes)
         self._win: tk.Toplevel | None = None
         self._canvas: tk.Canvas | None = None
-        self._shown = [0.0] * N_BARS  # eased bar amplitudes
+        self._shown = [0.0] * N_POINTS  # eased amplitudes along the line
+        self._phase = 0.0
 
     def show(self) -> None:
         if self._win is not None:
@@ -77,7 +81,8 @@ class Overlay:
         self._make_unfocusable(win)
         self._win = win
         self._canvas = c
-        self._shown = [0.0] * N_BARS
+        self._shown = [0.0] * N_POINTS
+        self._phase = 0.0
         self._animate()
 
     def _make_unfocusable(self, win: tk.Toplevel) -> None:
@@ -94,25 +99,30 @@ class Overlay:
         if self._win is None or self._canvas is None:
             return
         c = self._canvas
-        c.delete("bars")
+        c.delete("live")
+        mid = HEIGHT / 2
+        self._phase += 0.22
+
+        # breathing dot: slow pulse, independent of the mic
+        dr = DOT_R + 0.8 * math.sin(self._phase * 0.35)
+        c.create_oval(DOT_X - dr, mid - dr, DOT_X + dr, mid + dr,
+                      fill=LIVE, outline="", tags="live")
 
         levels = list(self._levels)
-        recent = levels[-N_BARS:] if levels else []
-        recent = [0.0] * (N_BARS - len(recent)) + recent  # left-pad quiet
-        mid = HEIGHT / 2
-        total = N_BARS * BAR_W + (N_BARS - 1) * GAP
-        x = (WIDTH - total) / 2 + BAR_W / 2
-        for i in range(N_BARS):
+        recent = levels[-N_POINTS:] if levels else []
+        recent = [0.0] * (N_POINTS - len(recent)) + recent  # left-pad quiet
+        step = (LINE_X1 - LINE_X0) / (N_POINTS - 1)
+        coords = []
+        for i in range(N_POINTS):
             target = min(MAX_AMP, recent[i] * 240)
-            self._shown[i] += (target - self._shown[i]) * 0.35  # ease, don't jump
-            amp = max(1.2, self._shown[i])  # silence reads as a dotted line
-            c.create_line(
-                x, mid - amp, x, mid + amp,
-                width=BAR_W, capstyle=tk.ROUND,
-                fill=_lerp_color(min(1.0, amp / MAX_AMP)),
-                tags="bars",
-            )
-            x += BAR_W + GAP
+            self._shown[i] += (target - self._shown[i]) * 0.3  # ease, don't jump
+            # taper both ends so the line leaves and rejoins the midline
+            taper = math.sin(math.pi * i / (N_POINTS - 1))
+            amp = max(QUIET_AMP, self._shown[i]) * taper
+            y = mid + amp * math.sin(self._phase + i * 0.9)
+            coords += [LINE_X0 + i * step, y]
+        c.create_line(*coords, width=2, fill=VOICE, smooth=True,
+                      capstyle=tk.ROUND, joinstyle=tk.ROUND, tags="live")
         self._win.after(33, self._animate)  # ~30 fps for smooth easing
 
     def hide(self) -> None:
