@@ -62,8 +62,8 @@ Repair-VenvPythonw
 Write-Host ""
 if ($Background) {
     Start-Process -FilePath (Resolve-Path ".venv\Scripts\pythonw.exe") -ArgumentList "-m","dhwani" -WorkingDirectory $PSScriptRoot
-    Write-Host "dhwani running hidden - Right Alt to dictate - http://127.0.0.1:8770 (survives closing this window)"
+    Write-Host "dhwani running hidden - Alt+3 to dictate - http://127.0.0.1:8770 (survives closing this window)"
 } else {
-    Write-Host "dhwani starting - Right Alt to dictate - transcripts at http://127.0.0.1:8770 (closes with this window; use -Background to detach)"
+    Write-Host "dhwani starting - Alt+3 to dictate - transcripts at http://127.0.0.1:8770 (closes with this window; use -Background to detach)"
     & ".venv\Scripts\python.exe" -m dhwani
 }

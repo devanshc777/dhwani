@@ -26,7 +26,7 @@ $s = $shell.CreateShortcut($lnk)
 $s.TargetPath = $pythonw
 $s.Arguments = "-m dhwani"
 $s.WorkingDirectory = $repo
-$s.Description = "dhwani - local dictation (Right Alt)"
+$s.Description = "dhwani - local dictation (Alt+3)"
 $s.Save()
 Write-Host "autostart installed -> $lnk"
 Write-Host "runs hidden (pythonw); check http://127.0.0.1:8770 or Task Manager"

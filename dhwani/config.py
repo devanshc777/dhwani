@@ -27,14 +27,12 @@ INITIAL_PROMPT = os.getenv(
 )
 
 SAMPLE_RATE = 16_000  # whisper's native rate
-# Right Alt, tapped: the least-colliding trigger on this keyboard (no Right
-# Ctrl present). Bare Fn is firmware-invisible, F-keys sit behind media mode,
-# and every modifier chord (Ctrl+Alt, Ctrl+Shift+Alt) doubles as some app's
-# shortcut prefix. Left Alt still carries all shortcuts. On AltGr layouts
-# (right alt types accents), override via DHWANI_HOTKEY instead.
-# Comma-separated aliases all bind to the same toggle: Windows reports the
-# physical Right Alt key as "alt gr" on some layouts and "right alt" on others.
-HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt,alt gr")
+# Alt+3. A bare Right Alt fired on every AltGr keystroke (typing @ or # on
+# layouts that have AltGr), and the modifier-only chords double as app
+# shortcut prefixes. AltGr+3 arrives as Ctrl+Alt+3, which does not match.
+# Comma-separated aliases all bind to the same toggle; override via
+# DHWANI_HOTKEY.
+HOTKEY = os.getenv("DHWANI_HOTKEY", "alt+3")
 PORT = int(os.getenv("DHWANI_PORT", "8770"))
 
 # Free the model weights (~300 MB for base) after this many idle minutes;

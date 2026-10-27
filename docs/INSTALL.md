@@ -55,7 +55,7 @@ The first run can take **3–10 minutes** depending on your internet. Don't clos
 the window. When it prints something like
 
 ```
-dhwani starting - Right Alt to dictate - transcripts at http://127.0.0.1:8770
+dhwani starting - Alt+3 to dictate - transcripts at http://127.0.0.1:8770
 ```
 
 you're done. dhwani is listening.
@@ -67,10 +67,10 @@ you're done. dhwani is listening.
 
 1. Click into any app where you can type — Notepad, Word, Chrome's address bar,
    a WhatsApp message box. Anywhere.
-2. Press **Right Alt** (the Alt key on the *right* side of the spacebar).
+2. Press **Alt+3** (hold Alt, tap the 3 above the letters).
    A small glowing waveform appears at the bottom of your screen.
 3. Talk normally.
-4. Press **Right Alt** again.
+4. Press **Alt+3** again.
 
 A moment later your words appear at the cursor, punctuated and capitalized,
 with the *ums* and *uhs* removed.
@@ -120,8 +120,7 @@ next time you press the key.
 
 ## Changing the key without touching code
 
-Right Alt is the default. On some keyboard layouts (AltGr) that key types
-accented characters, and you'll want a different one.
+Alt+3 is the default. If another app already uses Alt+3, pick a different key.
 
 No code editing needed — set an environment variable:
 
@@ -169,12 +168,12 @@ Python didn't install, or didn't get added to PATH. Redo [Step 1](#step-1--insta
 via the Microsoft Store — that route handles PATH for you. Then close every
 PowerShell window and start again (the change only reaches new windows).
 
-### Nothing happens when I press Right Alt
+### Nothing happens when I press Alt+3
 
 - Is dhwani actually running? Open `http://127.0.0.1:8770`. If the page doesn't
   load, it isn't — redo [Step 3](#step-3--start-it).
-- Are you pressing the Alt to the **right** of the spacebar? The left one does
-  nothing.
+- Use the 3 in the number row above the letters. The number-pad 3 is a
+  different key.
 - Are you in an app that runs as administrator (some IT tools, Task Manager)?
   Windows blocks keyboard hooks from reaching those. Right-click `run.ps1` →
   Run with PowerShell **as administrator** if you need it there.

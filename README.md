@@ -4,8 +4,8 @@
 
 # dhwani <sub>ध्वनि · "sound"</sub>
 
-Local push-to-talk dictation for Windows. Press **Right Alt**, speak, press
-**Right Alt** again — clean text lands wherever your cursor is. Whisper on CPU,
+Local push-to-talk dictation for Windows. Press **Alt+3**, speak, press
+**Alt+3** again — clean text lands wherever your cursor is. Whisper on CPU,
 zero cloud, zero LLM, zero subscription.
 
 A minimal open-source take on the [Wispr Flow](https://wisprflow.ai) idea:
@@ -33,7 +33,7 @@ Full click-by-click walkthrough with every prompt you'll see:
 3. **Start it.** Open the extracted folder, right-click `run.ps1` →
    **Run with PowerShell**. First run takes a few minutes — it's downloading
    the speech model (~74 MB). Leave it alone until it says *dhwani starting*.
-4. **Use it.** Press **Right Alt**, talk, press **Right Alt** again. Your words
+4. **Use it.** Press **Alt+3**, talk, press **Alt+3** again. Your words
    appear wherever your cursor is — Word, Chrome, WhatsApp, anywhere.
 
 If Windows blocks the script, see
@@ -56,7 +56,7 @@ cd dhwani
 ## How it works
 
 ```
-Right Alt ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
+Alt+3     ──▶ mic capture ──▶ faster-whisper ──▶ rule cleanup ──▶ Ctrl+V inject
           (sounddevice)   (base, int8, CPU)  (fillers, cmds)   (clipboard)
                │                                    │
         waveform overlay                       SQLite history
@@ -69,7 +69,7 @@ the others. The data contract is the architecture.
 
 ## Features
 
-- **Right Alt toggle** anywhere in Windows (configurable), debounced against key
+- **Alt+3 toggle** anywhere in Windows (configurable), debounced against key
   auto-repeat; utterances process strictly in order
 - **Floating waveform pill** — a small transparent glow-waveform while
   recording that never steals focus from the app you're dictating into
@@ -108,7 +108,7 @@ Both are tracked in [Roadmap](#roadmap) below.
 | `DHWANI_MODEL` | `base` | `tiny` (fastest) / `base` / `small` (most accurate) |
 | `DHWANI_LANGUAGE` | `en` | any whisper code, or `auto` (unreliable on short clips) |
 | `DHWANI_PROMPT` | your names/jargon | words the decoder should spell correctly |
-| `DHWANI_HOTKEY` | `right alt` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
+| `DHWANI_HOTKEY` | `alt+3` | any [`keyboard`](https://github.com/boppreh/keyboard) combo |
 | `DHWANI_IDLE_UNLOAD_MIN` | `30` | minutes before model unloads (0 = never) |
 | `DHWANI_PORT` | `8770` | web UI port |
 | `DHWANI_DB` | `~/.dhwani/transcripts.db` | history location |
@@ -122,17 +122,17 @@ no-code way to do it below.
 The trigger lives on one line, `HOTKEY` in [`dhwani/config.py`](dhwani/config.py):
 
 ```python
-HOTKEY = os.getenv("DHWANI_HOTKEY", "right alt")
+HOTKEY = os.getenv("DHWANI_HOTKEY", "alt+3")
 ```
 
 Set the `DHWANI_HOTKEY` environment variable (no code change — see
 [docs/INSTALL.md](docs/INSTALL.md#changing-the-key-without-touching-code) for
 the click-through), or edit the default string.
 Any combo the [`keyboard`](https://github.com/boppreh/keyboard) library parses
-works: `f8`, `ctrl+win`, `ctrl+shift+d`, `right ctrl`, ... Two notes if you
+works: `f8`, `ctrl+win`, `ctrl+shift+d`, `right ctrl`, ... One note if you
 clone this: bare `Fn` is firmware-level and invisible to the OS, so it can't
-be bound; and on AltGr layouts the default `right alt` types accents, so pick
-something else.
+be bound. Avoid a bare `right alt` on AltGr layouts: it fires every time you
+type an accent, `@` or `#`.
 
 ## Measuring quality (eval harness)
 
@@ -169,7 +169,7 @@ Non-coder problems are covered in plain language in
 
 - **"Running scripts is disabled on this system"** — Windows' default script
   policy. Fix in [docs/INSTALL.md](docs/INSTALL.md#windows-says-running-scripts-is-disabled).
-- **Nothing happens when I press Right Alt** — the app has to be running.
+- **Nothing happens when I press Alt+3** — the app has to be running.
   Check for the `dhwani` window, or open `http://127.0.0.1:8770`.
 - **Output in the wrong language/script** — you're on `DHWANI_LANGUAGE=auto`;
   pin it (`en`). Short clips give detection a coin toss.

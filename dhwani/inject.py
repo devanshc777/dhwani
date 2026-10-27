@@ -5,7 +5,7 @@ that accepts paste, including ones where synthetic per-key typing breaks
 (Electron apps, some IMEs, RDP). Previous clipboard content is restored
 after a short delay.
 
-Subtlety: the hotkey is Alt+V, so Alt is often still physically held when
+Subtlety: the hotkey is Alt+3, so Alt is often still physically held when
 injection runs. Without releasing it, Ctrl+V becomes Ctrl+Alt+V (which
 most apps ignore). We force-release modifiers and give the OS a beat.
 """

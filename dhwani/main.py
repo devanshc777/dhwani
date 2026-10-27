@@ -119,9 +119,9 @@ def main() -> None:
         root.after(60_000, _idle_watch)
 
     threading.Thread(target=_worker, daemon=True).start()
-    # suppress=False: a modifier-only chord types nothing, and suppressing it
-    # would eat Ctrl/Alt keydowns that other app shortcuts need. Each comma-
-    # separated alias binds the same toggle (see config.HOTKEY).
+    # suppress=False: suppressing a chord makes keyboard hold back modifier
+    # keydowns that other app shortcuts need. Alt+3 types nothing in most apps.
+    # Each comma-separated alias binds the same toggle (see config.HOTKEY).
     for hk in [h.strip() for h in config.HOTKEY.split(",") if h.strip()]:
         keyboard.add_hotkey(hk, toggle, suppress=False)
 
